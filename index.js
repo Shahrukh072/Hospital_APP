@@ -1,42 +1,21 @@
-const express = require('express')
+//require
+const express = require('express');
+const port=8000;
 const bodyParser = require('body-parser');
-const mongoose = require('./config/mongoose');
-const patients = require('./routes/patients');
-const doctors = require('./routes/doctors');
-const jwt = require('jsonwebtoken');
+const db = require('./config/mongoose');
 const app = express();
+const passport = require("passport");
+const passportJwt = require("./config/passport-jwt-startegy");
 
-app.set('secretKey', 'api');
-app.use(bodyParser.urlencoded({
-    extended: false 
-}));
-app.use('/doctors', doctors);
-app.use('/patients', validateUser, patients);
+app.use(bodyParser.urlencoded());
 
-//validate jwt
-function validateUser(req, res, next) {
-    jwt.verify(req.headers['x-access-token'], req.app.get('secretKey'), function (err, decoded) {
-        if (err) {
-            res.json({
-                status: "error",
-                message: err.message,
-                data: null
-            });
-        } else {
-            req.body.userId = decoded.id;
-            next();
-        }
-    });
-}
+//routes
+app.use("/", require("./routes"));
 
-
-app.get('/', function (req, res) {
-    res.json({
-        "body": "hospital app"
-    });
+//server
+app.listen(port, function () {
+    console.log(`Server listening on port ${8000}`);
 });
 
 
-app.listen(8080, function () {
-    console.log('Node server listening on port 8080');
-});
+module.exports =app;
